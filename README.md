@@ -24,7 +24,6 @@ Before setting up Flex Metrics, ensure you have the following installed on your 
 ## 🚀 Tech Stack
 
 ### Backend (Java / Spring Boot)
-
 - **Framework**: Spring Boot 3.4.1 (Java 21)
 - **Security**: Spring Security with stateless JWT Authentication
 - **Database**: PostgreSQL (production) / H2 Database (local development)
@@ -32,7 +31,6 @@ Before setting up Flex Metrics, ensure you have the following installed on your 
 - **Persistence**: Spring Data JPA & Hibernate
 
 ### Frontend (React / TypeScript)
-
 - **Bundler**: Vite & React 18 (TypeScript)
 - **Styling**: Tailwind CSS & Glassmorphism design system
 - **3D Graphics**: React Three Fiber & Three.js (Holographic Biometric Scanner)
@@ -48,6 +46,7 @@ Before setting up Flex Metrics, ensure you have the following installed on your 
 ├── backend/                  # Spring Boot 3.4 Application
 │   ├── src/main/java/        # Modules (Auth, User, Workouts, Nutrition)
 │   ├── src/main/resources/   # Migration scripts & application.yml properties
+│   ├── .env.example          # Environment variables template for backend
 │   └── pom.xml               # Maven configuration
 │
 ├── frontend/                 # React & Vite client
@@ -59,7 +58,7 @@ Before setting up Flex Metrics, ensure you have the following installed on your 
 │   │   ├── pages/            # Page templates (Dashboard)
 │   │   ├── store/            # Zustand global UI & Auth stores
 │   │   └── App.tsx           # Page Routing and guards
-│   ├── .env                  # Environment configurations
+│   ├── .env.example          # Environment variables template for frontend
 │   └── package.json          # Node dependencies
 ```
 
@@ -78,7 +77,6 @@ Flex Metrics integrates the OpenFoodFacts API to allow users to search products 
 ## 🛠️ Step-by-Step Setup Guide
 
 ### 📦 Step 1: Clone the Repository
-
 ```bash
 git clone https://github.com/Nidish2/Flex_Metrics__A_Fitness_Tracker.git
 cd Flex_Metrics__A_Fitness_Tracker
@@ -88,20 +86,21 @@ cd Flex_Metrics__A_Fitness_Tracker
 
 ### ☕ Step 2: Configure & Start the Backend
 
-The backend utilizes Flyway migrations to automatically construct database tables on launch.
-
-#### 1. Configure properties (Optional)
-
-By default, the backend runs on port `8080` using an in-memory H2 database.
-To review database or security setup:
-
-- Navigate to: `src/main/resources/application.yml`
+#### 1. Configure environment variables
+The backend repository contains a `backend/.env.example` template file. To configure your database settings, JWT secrets, and allowed origins:
+- Copy the template file to create a new `.env` file inside the `backend` folder:
+  ```bash
+  # Inside backend/ folder
+  cp .env.example .env
+  ```
+- Open `.env` and fill out the required variables (e.g. database credentials, JWT secret key, and CORS domains).
 
 #### 2. Run Database Migrations & Start Server
-
-Execute the Spring Boot runner command inside the root folder:
-
+Execute the Spring Boot runner command inside the `backend` folder:
 ```bash
+# Navigate to the backend folder
+cd backend
+
 # On Windows PowerShell / Command Prompt
 ./mvnw spring-boot:run
 
@@ -109,21 +108,13 @@ Execute the Spring Boot runner command inside the root folder:
 chmod +x mvnw
 ./mvnw spring-boot:run
 ```
-
 *Verification: Open your browser to `http://localhost:8080/api/v1/health` or verify console shows `Started BackendApplication`.*
 
 #### 3. Build & Package JAR for Production
-
 To compile and bundle the backend into a single runnable fat JAR:
-
 ```bash
-# Windows
-./mvnw clean package
-
-# Linux / macOS
 ./mvnw clean package
 ```
-
 *The output package will be generated inside the `target/` directory.*
 
 ---
@@ -131,43 +122,36 @@ To compile and bundle the backend into a single runnable fat JAR:
 ### 💻 Step 3: Configure & Start the Frontend
 
 #### 1. Navigate to the client folder
-
 ```bash
+# From project root
 cd frontend
 ```
 
 #### 2. Install dependencies
-
 ```bash
 npm install
 ```
 
-#### 3. Setup environment variables
-
-Create a `.env` file in the `frontend/` directory:
-
-```env
-VITE_API_BASE_URL=http://localhost:8080
-```
+#### 3. Configure environment variables
+The frontend repository contains a `frontend/.env.example` template file:
+- Copy the template file to create a `.env` configuration file:
+  ```bash
+  cp .env.example .env
+  ```
+- Open the `.env` file and verify or change the `VITE_API_BASE_URL` pointing to your running backend API.
 
 #### 4. Run the Client Dev Server
-
 Start the local hot-reloaded development environment:
-
 ```bash
 npm run dev
 ```
-
 *Open your browser and navigate to `http://localhost:5173` to launch the application!*
 
 #### 5. Compile and Build for Production
-
 To bundle the React app into static optimized HTML/JS/CSS assets:
-
 ```bash
 npm run build
 ```
-
 *Static production bundles are output to the `frontend/dist/` directory.*
 
 ---
