@@ -2,8 +2,14 @@ import axios from 'axios'
 import { useAuthStore } from '../store/useAuthStore'
 import { toast } from 'sonner'
 
+const PRIMARY_URL = import.meta.env.VITE_API_BASE_URL || ''
+const FALLBACK_URL = import.meta.env.VITE_API_FALLBACK_URL || ''
+
+let currentBaseURL = PRIMARY_URL
+
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '',
+  baseURL: currentBaseURL,
+  timeout: 10000, // 10 seconds timeout to detect unresponsive/sleeping servers
   headers: {
     'Content-Type': 'application/json',
   },
@@ -23,10 +29,29 @@ apiClient.interceptors.request.use(
   }
 )
 
-// Response Interceptor: Handle 401 Unauthorized
+// Response Interceptor: Handle Fallbacks and 401 Unauthorized
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
+    const originalRequest = error.config
+
+    // If request fails (network error or timeout) and we haven't retried yet, switch to fallback URL
+    if (
+      FALLBACK_URL &&
+      (!error.response || error.code === 'ECONNABORTED') &&
+      !originalRequest._retryWithFallback
+    ) {
+      originalRequest._retryWithFallback = true
+
+      // Switch current URL (between primary and fallback)
+      currentBaseURL = currentBaseURL === PRIMARY_URL ? FALLBACK_URL : PRIMARY_URL
+      apiClient.defaults.baseURL = currentBaseURL
+      originalRequest.baseURL = currentBaseURL
+
+      console.warn(`API request failed. Automatically retrying with fallback URL: ${currentBaseURL}`)
+      return apiClient(originalRequest)
+    }
+
     if (error.response && error.response.status === 401) {
       // Clear Zustand auth state
       useAuthStore.getState().logout()
