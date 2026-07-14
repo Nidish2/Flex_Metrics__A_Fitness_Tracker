@@ -3,12 +3,6 @@ spring:
     url: ${DB_URL}
     username: ${DB_USER}
     password: ${DB_PASSWORD}
-    hikari:
-      maximum-pool-size: 4
-      minimum-idle: 2
-      idle-timeout: 30000
-      max-lifetime: 1800000
-      connection-timeout: 20000
 
   jpa:
     hibernate:
@@ -21,6 +15,7 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: true
+
   cache:
     type: caffeine
     caffeine:
